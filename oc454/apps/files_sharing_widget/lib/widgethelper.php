@@ -19,7 +19,7 @@ class OC_Widget_Helper {
 	 * Returns a absolute url to the given service.
 	 */
 	public static function linkToWidget($service, $add_slash = false) {
-		return OC_Helper::linkToAbsolute( '', 'widget.php') . '?action=' . $service . (($add_slash && $service[strlen($service)-1]!='/')?'/':'');
+		return OC_Helper::linkToAbsolute( '', 'public.php') . '?service=pics&action=' . $service . (($add_slash && $service[strlen($service)-1]!='/')?'/':'');
 	}
    
    
@@ -73,7 +73,7 @@ class OC_Widget_Helper {
 					$image -> show();
 				}
      }
-   
+  
     /**
 	 * @load Template for real view
 	 * @param int width of the widget
@@ -81,7 +81,7 @@ class OC_Widget_Helper {
 	 * @return return the template
 	 *
 	 */
-   public static function getRelativeAppWebPath() {
+/*    public static function getRelativeAppWebPath() {
 		
 		foreach(OC::$APPSROOTS as $dir) {
 			if(file_exists($dir['path'].'/files_sharing_widget')) {
@@ -90,19 +90,16 @@ class OC_Widget_Helper {
 		}
 		return false;
 	}
-   
+*/   
     public static function loadTemplateReal($WIDTH="770",$HEIGHT="570",$TITLE='Zeus-Cloud Picture Widget') {
-    	
-		$getRelativeAppsPath=OC_Widget_Helper::getRelativeAppWebPath();
-		if(strripos(OC::$WEBROOT,'/')) $getRelativeAppsPath=substr($getRelativeAppsPath,1,strlen($getRelativeAppsPath)-1);
-		
+    			
 		$tpl="<!DOCTYPE html>\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"de-DE\" lang=\"de-DE\">\n<head>\n<title>".htmlentities(utf8_decode($TITLE))."</title>
 		\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><meta content=\"yes\" name=\"apple-mobile-web-app-capable\" />
 		\n<meta content=\"minimum-scale=1.0, width=device-width, maximum-scale=0.6667, user-scalable=no\" name=\"viewport\" />
-		\n<link href=\"".OC_HELPER::makeURLAbsolute(OC::$WEBROOT).$getRelativeAppsPath."/files_sharing_widget/img/startup.png\" rel=\"apple-touch-startup-image\" />
-        \n<link href=\"".OC_HELPER::makeURLAbsolute(OC::$WEBROOT).$getRelativeAppsPath."/files_sharing_widget/img/homescreen.png\" rel=\"apple-touch-icon\" />
-										\n<script>var ownWidgetOptions = {crypt:'".$_GET['iToken']."',path:'".OC_HELPER::makeURLAbsolute(OC::$WEBROOT)."',appspath:'".$getRelativeAppsPath."',cssAddWidget:{'width':'".$WIDTH."','height':'".$HEIGHT."'}};</script>
-										\n<script src=\"".OC_HELPER::makeURLAbsolute(OC::$WEBROOT)."widgetloader.php\" type=\"text/javascript\"></script>\n
+		\n<link href=\"".OC_HELPER::makeURLAbsolute(OC_App::getAppWebPath('files_sharing_widget'))."/img/startup.png\" rel=\"apple-touch-startup-image\" />
+        \n<link href=\"".OC_HELPER::makeURLAbsolute(OC_App::getAppWebPath('files_sharing_widget'))."/img/homescreen.png\" rel=\"apple-touch-icon\" />
+										\n<script>var ownWidgetOptions = {crypt:'".$_GET['iToken']."',path:'".OC_HELPER::makeURLAbsolute(OC::$WEBROOT)."',appspath:'".OC_HELPER::makeURLAbsolute(OC_App::getAppWebPath('files_sharing_widget'))."',cssAddWidget:{'width':'".$WIDTH."','height':'".$HEIGHT."'}};</script>
+										\n<script src=\"".OC_HELPER::makeURLAbsolute(OC_App::getAppWebPath('files_sharing_widget'))."/js/widget.full.js\" type=\"text/javascript\"></script>\n
 									\n</head>
 									\n<body class=\"widgetbg\">
 										\n<div id=\"ownWidget-container\"></div>
@@ -138,7 +135,31 @@ class OC_Widget_Helper {
             )
         ,"\0\3");
     }
+	 /**
+	 * @decrypt string
+	 * @param string Value to decrypt
+	 * @param string Secret Key
+	 * @return decrypted string
+	 *
+	 */
 	
+	public static function decrypt($sValue, $sSecretKey) {
+		return rtrim(
+			mcrypt_decrypt(
+				MCRYPT_RIJNDAEL_256, 
+				$sSecretKey, 
+				base64_decode($sValue), 
+				MCRYPT_MODE_ECB,
+				mcrypt_create_iv(
+					mcrypt_get_iv_size(
+						MCRYPT_RIJNDAEL_256,
+						MCRYPT_MODE_ECB
+					), 
+					MCRYPT_RAND
+				)
+			)
+		,"\0\3");
+	}	
 	
 	 /**
 	 * @get Count Pics of Directory and one image for Preview 
@@ -192,7 +213,7 @@ class OC_Widget_Helper {
                      if($share['item_type']=='folder')  $itemTypeChoose='dir';
                       $expDate = new \DateTime($share['expiration'], new \DateTimeZone($tz));
                       $EXPDATE=$expDate->format('d.m.Y H:i');
-                      
+/*                      
                   if($share['share_type']==0){
                         $output[]=array(
                         'id'=>$share['id'],
@@ -215,6 +236,7 @@ class OC_Widget_Helper {
                         'iToken'=>''
                       );
                    }
+*/				   
                  if($share['share_type']==3){
                      $addPassImg='';
 					 $tokenLink='&'.$itemTypeChoose.'='.$share['path'];

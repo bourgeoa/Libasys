@@ -11,8 +11,19 @@ OC::$CLASSPATH['OC_Share_Backend_File'] = "files_sharing/lib/share/file.php";
 OC::$CLASSPATH['OC_Share_Backend_Folder'] = 'files_sharing/lib/share/folder.php';
 OC::$CLASSPATH['OC_Filestorage_Shared'] = "files_sharing/lib/sharedstorage.php";
 OCP\Util::connectHook('OC_Filesystem', 'setup', 'OC_Filestorage_Shared', 'setup');
-OCP\Share::registerBackend('file', 'OC_Share_Backend_File');
-OCP\Share::registerBackend('folder', 'OC_Share_Backend_Folder', 'file');
+//OCP\Share::registerBackend('file', 'OC_Share_Backend_File');
+//OCP\Share::registerBackend('folder', 'OC_Share_Backend_Folder', 'file');
+
+//
+$SESSIONPREFIX = OC_Config::getValue('SESSIONPREFIX');
+
+$shareSecret=OCP\Config::getSystemValue('secretword');
+if($shareSecret=='') $shareSecret='mySecretWord';
+$getSchluessel= OC_Widget_Helper::decrypt(rawurldecode($_GET['iToken']),$shareSecret);
+
+$_GET['dir']=$getSchluessel;
+//$_GET['service']='pics';
+//
 
 $bReal=false;
 if (isset($_GET['action']) && $_GET['action']=='real') {
