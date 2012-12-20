@@ -7,5 +7,10 @@
  *
  *
  */
+
+$pathload= "apps/files_sharing_widget/js/widget.full.js";
+
 header ("Content-type: text/javascript");
-readfile("apps/files_sharing_widget/js/widget.js");
+readfile($pathload);
+
+?>
