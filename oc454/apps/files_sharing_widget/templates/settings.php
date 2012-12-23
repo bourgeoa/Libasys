@@ -9,7 +9,7 @@
  */
 ?>
 <fieldset class="personalblock">
-    <legend>Shared files and folders with link</legend>
+    <legend>Shared Files and Folders</legend>
        <ul class="shareSettings">
 		<li class="shareHeading">
 			<span style="width:10%; float:left;display:block;">ShareType </span>
@@ -27,8 +27,10 @@
 <span style="width:15%;float:left;display:block;"><?php echo $shareInfo['shareName']; ?></span>
 <span style="width:15%;float:left;display:block;"><a href="<?php echo $shareInfo['link']; ?>" target="_blank"><?php echo $shareInfo['name']; ?></a></span>
 <span style="width:20%;float:left;display:block;"><?php echo $shareInfo['date']; ?></span>
-<span style="width:38%;display:block;float:left;"><a id="widgetlink-<?php echo $shareInfo['id'] ?>" href="<?php echo OC_HELPER::makeURLAbsolute(OC::$WEBROOT); ?>/public.php?service=pics&action=real&iToken=<?php echo $shareInfo['iToken']; ?>" target="_blank"><?php echo $shareInfo['iToken']; ?></a></span><br style="clear:both;" /></li>
+<span style="width:38%;display:block;float:left;"><a id="widgetlink-<?php echo $shareInfo['id'] ?>" href="<?php echo OC_HELPER::makeURLAbsolute(OC::$WEBROOT); ?>/widget.php?action=real&iToken=<?php echo $shareInfo['iToken']; ?>" target="_blank"><?php echo $shareInfo['iToken']; ?></a></span><br style="clear:both;" /></li>
 <?php endforeach;}
+	$getRelativeAppsPath=OC_Widget_Helper::getRelativeAppWebPath();
+	$getRelativeAppsPath=substr($getRelativeAppsPath,1,strlen($getRelativeAppsPath)-1);
 ?>
 </ul><br />
 <b>Configurationparameters:</b><br />
@@ -45,24 +47,15 @@
 <br /><br />
 Use as Widget: (For Integration Homepage, Facebook)<br />
 <textarea style="width:60%;height:120px;" readonly>
-<!DOCTYPE html>
-<html>
-<head>
-<title>Galerie Widget by Libasys</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script>
 	var ownWidgetOptions = {
 	crypt:'thecryptoken', //e.g.os3Nz8rhqNnV1cfUotvc2M3H0w==
 	path:'<?php echo OC_Helper::makeURLAbsolute(OC::$WEBROOT . '/'); ?>',
-	appspath:'<?php echo OC_HELPER::makeURLAbsolute(OC_App::getAppWebPath('files_sharing_widget')); ?>',
+	appspath:'<?php echo $getRelativeAppsPath; ?>',
 	cssAddWidget:{'width':670,'height':400}
-	};
+	}
 </script>
-<script src="<?php echo OC_HELPER::makeURLAbsolute(OC_App::getAppWebPath('files_sharing_widget')); ?>/js/widget.full.js" type="text/javascript"></script>
-</head>
-<body class="widgetbg"><div id="ownWidget-container"></div></body>
-</html>
-</textarea>
+<script src="<?php echo OC_HELPER::makeURLAbsolute(OC::$WEBROOT).'/'.$getRelativeAppsPath; ?>/files_sharing_widget/js/widget.js" type="text/javascript"></script></textarea>
 
 </fieldset>
 <!-- Dialogs -->

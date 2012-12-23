@@ -13,7 +13,7 @@
 	if (window.jQuery === undefined || window.jQuery.fn.jquery !== "1.8.2") {
 		var script_tag = document.createElement("script");
 		script_tag.setAttribute("type", "text/javascript");
-		script_tag.setAttribute("src",ownWidgetOptions.appspath+ "/js/jquery-pack.min.js");
+		script_tag.setAttribute("src",ownWidgetOptions.path + ownWidgetOptions.appspath+ "/files_sharing_widget/js/jquery-pack.min.js");
 		if (script_tag.readyState) {
 			
 			script_tag.onreadystatechange = function() {
@@ -50,7 +50,11 @@
 		//	if($.browser.msie && $.browser.version<9){
 				//widgetContainer.css('opacity',0.3);
 		//	}
-			 OwnWidget.init(ownWidgetOptions);
+		 if(ownWidgetOptions.showButtonLink!=undefined){
+		    OwnWidget.prepareExternLink(ownWidgetOptions);
+		 }else{
+			 if($("#ownWidget-container").length>0) OwnWidget.init(ownWidgetOptions);
+		 }
 		});
 	}
 	
@@ -60,7 +64,10 @@ var OwnWidget={
 		var defaults={ 
 			crypt:'',
 		 	path:'',
-		 	appspath:'', //<?php echo OC_HELPER::makeURLAbsolute(OC_App::getAppWebPath("files_sharing_widget")); ?>
+		 	appspath:'apps',
+		 	showButtonLink:'',
+		 	customThumbHeight:'',
+		 	customThumbpPage:'',
 		 	display:'',
 		 	fbAppid:'',
 		 	modal:true,
@@ -83,12 +90,24 @@ var OwnWidget={
 			} else {
 				this.showWidget();
 		   }
-	   this.initSupersized()	   
+	   this.initSupersized();
+	    
 	},
-	
+	prepareExternLink:function(options){
+		var self=this;
+		
+		if(options.showButtonLink!=''){
+			jQuery('#'+options.showButtonLink).click(function(){
+				clearTimeout(timeout);
+                var timeout=setTimeout(function(){self.init(options);}, 500);
+				
+						
+			});
+		}
+	},
 	loadCssFile:function(){
 		if(jQuery('#ownWidgetCss').length<1){
-		  jQuery("<link>", {id:'ownWidgetCss',rel : "stylesheet",type : "text/css",href :this.options.appspath + "/css/widget.css"}).appendTo("head");
+		  jQuery("<link>", {id:'ownWidgetCss',rel : "stylesheet",type : "text/css",href :this.options.path + this.options.appspath+ "/files_sharing_widget/css/widget.css"}).appendTo("head");
 		}
 	},
 	
@@ -206,10 +225,16 @@ var OwnWidget={
      
      loadData:function() {
 		var self = this;
+		var addCustomThumbSize='';
+		if(this.options.customThumbHeight!='') addCustomThumbSize='&cTh='+this.options.customThumbHeight;
+		
+		var addCustomThumbPage='';
+		if(this.options.customThumbpPage!='') addCustomThumbPage='&cTpP='+this.options.customThumbpPage;
+		//customThumbpPage
 		jQuery.ajax({
 			dataType : "jsonp",
 			jsonp : "jsonp_callback",
-			url : self.options.path + "/public.php?service=pics&iToken=" + rawurlencode(self.options.crypt) + self.loadPage,
+			url : self.options.path + "widget.php?iToken=" + rawurlencode(self.options.crypt) + self.loadPage+addCustomThumbSize+addCustomThumbPage,
 			
 			success : function(data) {
 				
@@ -241,6 +266,7 @@ var OwnWidget={
 					self.widgetContainer.css(self.options.cssAddWidget);
 					
 					if (!self.options.cssAddWidget.top && !self.options.cssAddWidget.left) {
+						
 						self.widgetContainer.css({
 							top : (jQuery(window).height() / 2) - (self.widgetContainer.height() / 2),
 							left : (jQuery(window).width() / 2) - (self.widgetContainer.width() / 2)
@@ -289,7 +315,7 @@ var OwnWidget={
 			progress_delay : false,
 			thumb_page : false,
 			thumb_interval : false,
-			image_path : this.options.appspath+ "/img/",
+			image_path : this.options.path + this.options.appspath+ "/files_sharing_widget/img/",
 			play_button : "#pauseplay",
 			next_slide : "#nextslide",
 			prev_slide : "#prevslide",
@@ -310,7 +336,7 @@ var OwnWidget={
 	},
 	 initSupersized:function() {
 		var self=this;
-		var htmlString = '<div id="slideshow-content" style="display:none;z-index:201;"><div id="closeSlideShow">X</div><div id="prevthumb"></div><div id="nextthumb"></div>	<a id="prevslide" class="load-item"></a>	<a id="nextslide" class="load-item"></a>	<div id="thumb-tray" class="load-item"><div id="thumb-back"></div><div id="thumb-forward"></div></div>	<div id="progress-back" class="load-item"><div id="progress-bar"></div></div><div id="controls-wrapper" class="load-item"><div id="controls"><a id="play-button"><img id="pauseplay" src="'+ this.options.appspath + '/img/pause.png" /></a><div id="slidecounter"><span class="slidenumber"></span><span class="totalslides"></span></div><div id="slidecaption"></div><a id="tray-button"><img id="tray-arrow" src="' + this.options.appspath + '/img/button-tray-up.png" /></a><ul id="slide-list"></ul></div></div></div>';
+		var htmlString = '<div id="slideshow-content" style="display:none;z-index:201;"><div id="closeSlideShow">X</div><div id="prevthumb"></div><div id="nextthumb"></div>	<a id="prevslide" class="load-item"></a>	<a id="nextslide" class="load-item"></a>	<div id="thumb-tray" class="load-item"><div id="thumb-back"></div><div id="thumb-forward"></div></div>	<div id="progress-back" class="load-item"><div id="progress-bar"></div></div><div id="controls-wrapper" class="load-item"><div id="controls"><a id="play-button"><img id="pauseplay" src="'+ this.options.path + this.options.appspath + '/files_sharing_widget/img/pause.png" /></a><div id="slidecounter"><span class="slidenumber"></span><span class="totalslides"></span></div><div id="slidecaption"></div><a id="tray-button"><img id="tray-arrow" src="' + this.options.path + this.options.appspath + '/files_sharing_widget/img/button-tray-up.png" /></a><ul id="slide-list"></ul></div></div></div>';
 		jQuery(htmlString).appendTo("body");
 		jQuery("#closeSlideShow").click(function() {
 			if (jQuery.supersized.vars.slideshow_interval) {
